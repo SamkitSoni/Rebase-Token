@@ -5,7 +5,7 @@ import {IRebaseToken} from "./interfaces/IRebaseToken.sol";
 
 contract Vault {
     // we need to pass the token address to the constructor
-    //create a deposit function that mints tokens to the user 
+    //create a deposit function that mints tokens to the user
     //create a reedem function that burns tokens from the user and sends the user ETH
     //create a way to add rewards to the vault
 
@@ -31,8 +31,8 @@ contract Vault {
     function redeem(uint256 _amount) external {
         i_rebaseToken.burn(msg.sender, _amount);
         // send the user ETH
-        (bool success,) = payable(msg.sender).call{value: _amount}(""); 
-        if(!success) {
+        (bool success,) = payable(msg.sender).call{value: _amount}("");
+        if (!success) {
             revert Vault__ReedemFailed();
         }
         emit Redeem(msg.sender, _amount);

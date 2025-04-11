@@ -6,12 +6,12 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
-    * @title RebaseToken
-    * @author Samkit Soni
-    * @dev This is a cross-chain rebase token tht incentivises users to deposit into a vault and gain interest.
-    * @notice The interest rate in the smart contract can only decrease.
-    * @notice Each user will have their own interest rate that is the global interest at the time of depositing.
-    */
+ * @title RebaseToken
+ * @author Samkit Soni
+ * @dev This is a cross-chain rebase token tht incentivises users to deposit into a vault and gain interest.
+ * @notice The interest rate in the smart contract can only decrease.
+ * @notice Each user will have their own interest rate that is the global interest at the time of depositing.
+ */
 contract RebaseToken is ERC20, Ownable, AccessControl {
     error RebaseToken__InterestRateCanOnlyDecrease();
 
@@ -19,8 +19,8 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
     bytes32 private constant MINT_AND_BURN_ROLE = keccak256("MINT_AND_BURN_ROLE");
     uint256 private INTEREST_RATE = 5e10;
 
-    mapping (address => uint256) public s_userInterestRate;
-    mapping (address => uint256) public s_userLastUpdatedTimestamp;
+    mapping(address => uint256) public s_userInterestRate;
+    mapping(address => uint256) public s_userLastUpdatedTimestamp;
 
     event InterestRateChanged(uint256 newInterestRate);
 
@@ -33,10 +33,10 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
 
     function setInterestRate(uint256 _newInterestRate) external onlyOwner {
         //Set the interest rate
-        if(INTEREST_RATE > _newInterestRate) {
+        if (INTEREST_RATE > _newInterestRate) {
             revert RebaseToken__InterestRateCanOnlyDecrease();
         }
-        INTEREST_RATE = _newInterestRate; 
+        INTEREST_RATE = _newInterestRate;
         emit InterestRateChanged(_newInterestRate);
     }
 
@@ -48,7 +48,7 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
 
     function burn(address _from, uint256 _amount) external onlyRole(MINT_AND_BURN_ROLE) {
         //is a convenience feature often used in smart contracts to allow users to burn their entire token balance without needing to know or specify the exact amount.
-        if(_amount == type(uint256).max) {
+        if (_amount == type(uint256).max) {
             _amount = balanceOf(_from);
         }
         _mintAccruedInterest(_from);
@@ -62,10 +62,10 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
     function transfer(address _recipient, uint256 _amount) public override returns (bool) {
         _mintAccruedInterest(msg.sender);
         _mintAccruedInterest(_recipient);
-        if(_amount == type(uint256).max) {
+        if (_amount == type(uint256).max) {
             _amount = balanceOf(msg.sender);
         }
-        if(balanceOf(_recipient) == 0) {
+        if (balanceOf(_recipient) == 0) {
             s_userInterestRate[_recipient] = s_userInterestRate[msg.sender];
         }
         return super.transfer(_recipient, _amount);
@@ -74,10 +74,10 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
     function transferFrom(address _sender, address _recipient, uint256 _amount) public override returns (bool) {
         _mintAccruedInterest(_sender);
         _mintAccruedInterest(_recipient);
-        if(_amount == type(uint256).max) {
+        if (_amount == type(uint256).max) {
             _amount = balanceOf(_sender);
         }
-        if(balanceOf(_recipient) == 0) {
+        if (balanceOf(_recipient) == 0) {
             s_userInterestRate[_recipient] = s_userInterestRate[_sender];
         }
         return super.transferFrom(_sender, _recipient, _amount);
@@ -90,9 +90,9 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
     }
 
     /**
-        * @notice Mint the accured interest to the user since the last time they interacted with the protocol.
-        * @param _user The address of the user to mint the interest to.
-        */
+     * @notice Mint the accured interest to the user since the last time they interacted with the protocol.
+     * @param _user The address of the user to mint the interest to.
+     */
     function _mintAccruedInterest(address _user) internal {
         //Find their current balance of rebase tokens that have been minted to the user
         uint256 prevBalance = super.balanceOf(_user);
