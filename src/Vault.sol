@@ -22,13 +22,23 @@ contract Vault {
 
     receive() external payable {}
 
-    function deposit(uint256 _amount) external payable {
+    function deposit() external payable {
         // mint the tokens to the user
-        i_rebaseToken.mint(msg.sender, _amount);
+        i_rebaseToken.mint(msg.sender, msg.value);
         emit Deposit(msg.sender, msg.value);
     }
+    /**
+     *
+     * @param _amount Amount of tokens to redeem
+     * @dev If _amount is type(uint256).max, redeem all the tokens
+     * @notice Allow users to redeem their tokens for ETH
+     */
 
     function redeem(uint256 _amount) external {
+        //is a convenience feature often used in smart contracts to allow users to burn their entire token balance without needing to know or specify the exact amount.
+        if (_amount == type(uint256).max) {
+            _amount = i_rebaseToken.balanceOf(msg.sender);
+        }
         i_rebaseToken.burn(msg.sender, _amount);
         // send the user ETH
         (bool success,) = payable(msg.sender).call{value: _amount}("");

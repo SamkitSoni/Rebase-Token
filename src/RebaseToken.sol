@@ -17,7 +17,7 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
 
     uint256 private constant INTEREST_RATE_PRECISION = 1e18;
     bytes32 private constant MINT_AND_BURN_ROLE = keccak256("MINT_AND_BURN_ROLE");
-    uint256 private INTEREST_RATE = 5e10;
+    uint256 private INTEREST_RATE = (5 * INTEREST_RATE_PRECISION) / 1e8;
 
     mapping(address => uint256) public s_userInterestRate;
     mapping(address => uint256) public s_userLastUpdatedTimestamp;
@@ -33,7 +33,7 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
 
     function setInterestRate(uint256 _newInterestRate) external onlyOwner {
         //Set the interest rate
-        if (INTEREST_RATE > _newInterestRate) {
+        if (INTEREST_RATE <= _newInterestRate) {
             revert RebaseToken__InterestRateCanOnlyDecrease();
         }
         INTEREST_RATE = _newInterestRate;
@@ -47,10 +47,6 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
     }
 
     function burn(address _from, uint256 _amount) external onlyRole(MINT_AND_BURN_ROLE) {
-        //is a convenience feature often used in smart contracts to allow users to burn their entire token balance without needing to know or specify the exact amount.
-        if (_amount == type(uint256).max) {
-            _amount = balanceOf(_from);
-        }
         _mintAccruedInterest(_from);
         _burn(_from, _amount);
     }
@@ -86,7 +82,6 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
     function _calculateUserAccumulatedInterest(address _user) internal view returns (uint256 interest) {
         uint256 timeElapsed = block.timestamp - s_userLastUpdatedTimestamp[_user];
         interest = INTEREST_RATE_PRECISION + (s_userInterestRate[_user] * timeElapsed);
-        return interest;
     }
 
     /**
