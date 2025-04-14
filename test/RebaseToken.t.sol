@@ -111,7 +111,7 @@ contract TestRebaseToken is Test {
         // Deposit funds
         vm.startPrank(user);
         vm.expectRevert();
-        rebaseToken.mint(user, SEND_VALUE);
+        rebaseToken.mint(user, SEND_VALUE, SEND_VALUE);
         vm.stopPrank();
     }
 
