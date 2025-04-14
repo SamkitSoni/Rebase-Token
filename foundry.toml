@@ -5,7 +5,7 @@ libs = ["lib"]
 rpc_endpoints = {sepolia-eth = "https://eth-sepolia.g.alchemy.com/v2/uPfppn5iNv9fZQsmCzhVmZqjCgzQHOU1", arb-sepolia = "https://arb-sepolia.g.alchemy.com/v2/ietERFFABT7ZAlYvc3NTRRhk97QiBb0W"}
 
 remappings = [
-    "@openzepplin/=lib/openzepplin-contracts'/",
+    "@openzeppelin/=lib/openzeppelin-contracts/",
     "@ccip/=lib/ccip/",
     "@chainlink-local/=lib/chainlink-local/"
 ]
